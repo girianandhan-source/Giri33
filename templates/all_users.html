@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>All Users | FitBuddy</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #20312d;
+      --muted: #61736d;
+      --line: #d7e0db;
+      --paper: #f5f7f3;
+      --panel: #fff;
+      --green: #176b55;
+      --green-soft: #e5f1eb;
+      --coral: #c6533d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    header.page-header {
+      padding: 28px clamp(20px, 4vw, 56px) 22px;
+      background: var(--green);
+      color: #fff;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #c9e5d8;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Georgia, serif;
+      font-size: 32px;
+      font-weight: 500;
+    }
+
+    .summary {
+      margin: 8px 0 0;
+      color: #e0eee7;
+      font-size: 14px;
+    }
+
+    main { padding: 24px clamp(12px, 3vw, 40px) 48px; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    thead { background: #edf2ee; }
+    thead th { color: #425850; font-size: 12px; text-transform: uppercase; }
+    tbody th { min-width: 150px; font-size: 14px; }
+    tbody tr:last-child > * { border-bottom: 0; }
+    small, .muted { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; font-weight: 400; }
+    .number { white-space: nowrap; }
+    .goal { min-width: 180px; max-width: 260px; }
+    .plans { min-width: 420px; }
+    .plan-entry + .plan-entry { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .plan-heading { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin: 0 0 10px; font-size: 13px; }
+    .plan-heading strong { color: var(--green); }
+    .plan-columns { display: grid; grid-template-columns: repeat(2, minmax(180px, 1fr)); gap: 10px; }
+    .plan-version { min-width: 0; padding: 10px; background: var(--green-soft); border-left: 3px solid var(--green); }
+    .plan-version.updated { background: #fff0e9; border-left-color: var(--coral); }
+    .plan-version h3 { margin: 0 0 6px; font-size: 12px; }
+    pre { margin: 0; color: var(--ink); font: inherit; font-size: 13px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .empty-state { padding: 22px; border: 1px dashed #aabbb2; color: var(--muted); background: var(--panel); }
+
+    @media (max-width: 640px) {
+      .plan-columns { grid-template-columns: 1fr; }
+      header.page-header { padding-top: 22px; }
+      h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <p class="eyebrow">FitBuddy / Administration</p>
+    <h1>All users and plans</h1>
+    <p class="summary">{{ users|length }} user{% if users|length != 1 %}s{% endif %}</p>
+  </header>
+  <main>
+    {% if users %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">User</th>
+              <th scope="col">Age</th>
+              <th scope="col">Weight</th>
+              <th scope="col">Goal</th>
+              <th scope="col">Intensity</th>
+              <th scope="col">Schedule</th>
+              <th scope="col">Workout plans</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+              <tr>
+                <th scope="row">{{ user.name }}<small>ID {{ user.id }}</small></th>
+                <td class="number">{{ user.age }}</td>
+                <td class="number">{{ user.weight }} kg</td>
+                <td class="goal">{{ user.goal }}</td>
+                <td>{{ user.intensity }}</td>
+                <td class="number">{{ user.schedule }} days</td>
+                <td class="plans">
+                  {% if user.plans %}
+                    {% for plan in user.plans %}
+                      <article class="plan-entry">
+                        <p class="plan-heading"><strong>Plan {{ loop.index }}</strong><span class="muted">{{ plan.created_at }}</span></p>
+                        <div class="plan-columns">
+                          <section class="plan-version">
+                            <h3>Original plan</h3>
+                            <pre>{{ plan.original_plan }}</pre>
+                          </section>
+                          <section class="plan-version updated">
+                            <h3>Updated plan</h3>
+                            {% if plan.updated_plan %}
+                              <pre>{{ plan.updated_plan }}</pre>
+                            {% else %}
+                              <span class="muted">No update yet</span>
+                            {% endif %}
+                          </section>
+                        </div>
+                      </article>
+                    {% endfor %}
+                  {% else %}
+                    <span class="muted">No plans saved</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="empty-state">No users have been saved yet.</p>
+    {% endif %}
+  </main>
+</body>
+</html>
