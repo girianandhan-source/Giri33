@@ -153,6 +153,7 @@
 		.plan-result.visible { display: block; }
 		.plan-meta { display: flex; flex-wrap: wrap; gap: 7px 15px; padding: 0 0 14px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; }
 		.plan-meta strong { color: var(--ink); }
+		.plan-output-title { margin: 16px 0 0; font: 600 15px "Manrope", sans-serif; }
 		.plan-text { max-height: 430px; overflow: auto; padding: 17px 2px 18px 0; color: #283b35; font-size: 14px; line-height: 1.68; white-space: pre-wrap; overflow-wrap: anywhere; }
 		.feedback-area { padding-top: 16px; border-top: 1px solid var(--line); }
 		.feedback-area label { margin-bottom: 8px; }
@@ -262,7 +263,8 @@
 					</div>
 					<div class="plan-result" id="plan-result">
 						<div class="plan-meta"><span><strong id="plan-name"></strong></span><span id="plan-schedule"></span></div>
-						<div class="plan-text" id="plan-text"></div>
+						<h3 class="plan-output-title" id="plan-output-title">Workout plan</h3>
+						<div class="plan-text" id="plan-text" role="region" aria-labelledby="plan-output-title" tabindex="-1"></div>
 						<form class="feedback-area" id="feedback-form" hidden>
 							<label for="feedback">Adjust this plan</label>
 							<textarea id="feedback" name="feedback" minlength="3" maxlength="1000" placeholder="Make sessions shorter, add more recovery…" required></textarea>
@@ -282,6 +284,8 @@
 		const schedule = document.querySelector("#schedule");
 		const statusLine = document.querySelector("#plan-status");
 		const formError = document.querySelector("#form-error");
+		const planOutput = document.querySelector("#plan-text");
+		const planOutputTitle = document.querySelector("#plan-output-title");
 		let activeUserId = null;
 
 		schedule.addEventListener("input", () => {
@@ -332,11 +336,13 @@
 				activeUserId = result.user_id;
 				document.querySelector("#plan-name").textContent = payload.name;
 				document.querySelector("#plan-schedule").textContent = `${payload.schedule} training days / week`;
-				document.querySelector("#plan-text").textContent = result.plan;
+				planOutput.textContent = result.plan;
+				planOutputTitle.textContent = "Generated workout plan";
 				document.querySelector("#empty-result").hidden = true;
 				document.querySelector("#empty-result").style.display = "none";
 				document.querySelector("#plan-result").classList.add("visible");
 				feedbackForm.hidden = false;
+				planOutput.focus();
 				statusLine.textContent = "Plan saved";
 				statusLine.dataset.state = "success";
 			} catch (error) {
@@ -361,7 +367,9 @@
 					body: JSON.stringify({ feedback: String(new FormData(feedbackForm).get("feedback")).trim() }),
 				});
 				const result = await readResponse(response);
-				document.querySelector("#plan-text").textContent = result.updated_plan;
+				planOutput.textContent = result.updated_plan;
+				planOutputTitle.textContent = "Revised workout plan";
+				planOutput.focus();
 				statusLine.textContent = "Plan revised and saved";
 				statusLine.dataset.state = "success";
 				feedbackForm.reset();

@@ -7,21 +7,17 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
-from .ai.nutrition import (
+from app.ai.nutrition import (
 	NutritionTipConfigurationError,
 	generate_nutrition_tip_with_flash,
 )
-from .ai.workout imp.env
-.venv/
-fitbuddy.db
-__pycache__/
-*.py[cod]ort (
+from app.ai.workout import (
 	WorkoutPlanConfigurationError,
 	generate_workout_plan,
-	update_workout_plan,
+	update_workout_plan as revise_workout_plan,
 )
-from .config import ADMIN_TOKEN, BASE_DIR
-from .database import (
+from app.config import ADMIN_TOKEN, BASE_DIR
+from app.database import (
 	get_all_users_with_plans,
 	get_original_plan,
 	save_plan,
@@ -153,7 +149,7 @@ def update_user_plan(user_id: int, data: FeedbackRequest):
 		raise HTTPException(status_code=404, detail="Original plan not found for this user")
 
 	try:
-		updated = update_workout_plan(original, data.feedback)
+		updated = revise_workout_plan(original, data.feedback)
 	except WorkoutPlanConfigurationError as error:
 		raise HTTPException(status_code=503, detail=str(error)) from error
 	except Exception as error:

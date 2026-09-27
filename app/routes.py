@@ -14,7 +14,7 @@ from .ai.nutrition import (
 from .ai.workout import (
 	WorkoutPlanConfigurationError,
 	generate_workout_plan,
-	update_workout_plan,
+	update_workout_plan as revise_workout_plan,
 )
 from .config import ADMIN_TOKEN, BASE_DIR
 from .database import (
@@ -149,7 +149,7 @@ def update_user_plan(user_id: int, data: FeedbackRequest):
 		raise HTTPException(status_code=404, detail="Original plan not found for this user")
 
 	try:
-		updated = update_workout_plan(original, data.feedback)
+		updated = revise_workout_plan(original, data.feedback)
 	except WorkoutPlanConfigurationError as error:
 		raise HTTPException(status_code=503, detail=str(error)) from error
 	except Exception as error:
