@@ -11,7 +11,11 @@ from .ai.nutrition import (
 	NutritionTipConfigurationError,
 	generate_nutrition_tip_with_flash,
 )
-from .ai.workout import (
+from .ai.workout imp.env
+.venv/
+fitbuddy.db
+__pycache__/
+*.py[cod]ort (
 	WorkoutPlanConfigurationError,
 	generate_workout_plan,
 	update_workout_plan,
